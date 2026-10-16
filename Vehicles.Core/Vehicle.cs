@@ -1,4 +1,5 @@
-﻿namespace Vehicles.Core;
+﻿using System;   
+namespace Vehicles.Core;
 
 public abstract class Vehicle
 {
@@ -38,6 +39,42 @@ public abstract class Vehicle
 
         Odometer += km;
     }
+
+
+    internal event EventHandler<LogMessageEventArgs>? MessageCreated;
+
+    internal void OnVehicleAdded(object? sender, VehicleEventArgs e)
+    {
+        if (ReferenceEquals(this, e.Vehicle))
+        {
+            return;
+        }
+
+        string message =
+            $"{Make} {Model} honks to welcome " +
+            $"{e.Vehicle.Make} {e.Vehicle.Model}.";
+
+        MessageCreated?.Invoke(
+            this,
+            new LogMessageEventArgs(message));
+    }
+
+    internal void OnVehicleRemoved(object? sender, VehicleEventArgs e)
+    {
+        if (ReferenceEquals(this, e.Vehicle))
+        {
+            return;
+        }
+
+        string message =
+            $"{Make} {Model} flashes its lights after " +
+            $"{e.Vehicle.Make} {e.Vehicle.Model} leaves.";
+
+        MessageCreated?.Invoke(
+            this,
+            new LogMessageEventArgs(message));
+    }
+
 
     public override string ToString()
     {
